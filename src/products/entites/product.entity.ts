@@ -27,6 +27,9 @@ export class Product {
   @JoinColumn({ name: 'category_id' })
   category: Category;
 
+  @Column({ nullable: true })
+  category_id: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

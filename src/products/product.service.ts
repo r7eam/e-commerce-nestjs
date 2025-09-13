@@ -12,9 +12,22 @@ export class ProductService {
     private productsRepository: Repository<Product>,
   ) {}
     //1- create
-    create(createProductDto: CreateProductDto): Promise<Product> {
+    //1-create()
+    async create(createProductDto: CreateProductDto): Promise<Product> {
         const product = this.productsRepository.create(createProductDto);
-        return this.productsRepository.save(product);
+        const savedProduct = await this.productsRepository.save(product);
+        
+        // Return the product with category relationship loaded
+        const productWithCategory = await this.productsRepository.findOne({
+            where: { id: savedProduct.id },
+            relations: ['category']
+        });
+        
+        if (!productWithCategory) {
+            throw new NotFoundException('Product not found after creation');
+        }
+        
+        return productWithCategory;
     }
     //2- finde all
     findAll(): Promise<Product[]> {

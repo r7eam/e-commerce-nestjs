@@ -8,9 +8,11 @@ export class CreateCategoryDto {
   @IsString()
   name: string;
 
-  // @IsOptional()
+  @IsOptional()
+  @IsString()
   description?: string;
-  // @IsString()
-  image?: string;
 
+  @IsOptional()
+  @IsString()
+  image?: string;
 }
