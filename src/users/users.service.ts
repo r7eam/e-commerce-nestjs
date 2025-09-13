@@ -6,6 +6,9 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { User, UserRole } from "./entites/user.entity";
 import * as bcrypt from 'bcrypt';
 
+// Type for user response without password
+type SafeUser = Omit<User, 'password'>;
+
 @Injectable()
 export class UsersService {
     constructor(
@@ -13,14 +16,14 @@ export class UsersService {
         private readonly usersRepository: Repository<User>,
     ) {}
     //1-create()
-    async create(createUserDto: CreateUserDto): Promise<User> {
-        const { email, password, name, role } = createUserDto;  
+    async create(createUserDto: CreateUserDto): Promise<SafeUser> {
+        const { email, password: userPassword, name, role } = createUserDto;  
         const existingUser = await this.usersRepository.findOne({ where: { email } });
         if (existingUser) {
             throw new ConflictException('Email already in use');
         }
         //Hash the password before saving
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(userPassword, 10);
         //Create a new user object
         const user = this.usersRepository.create({
             email,
@@ -29,23 +32,26 @@ export class UsersService {
             role: UserRole.USER,
         });
         await this.usersRepository.save(user);
-        return user;
+        const { password, ...result } = user;
+        return result;
     }
 
     //2-findAll()
-    async findAll(): Promise<User[]> {
-        return this.usersRepository.find();
+    async findAll(): Promise<SafeUser[]> {
+        const users = await this.usersRepository.find();
+        return users.map(({ password, ...rest }) => rest);
     }
     //3-findOne()
-    async findOne(id: string): Promise<User> {
+    async findOne(id: string): Promise<SafeUser> {
         const userId = Number(id);
         const user = await this.usersRepository.findOne({ where: { id: userId } });
         if (!user) {
             throw new NotFoundException('User not found');
         }
-        return user;
+        const { password, ...result } = user;
+        return result;
     }
-    async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    async update(id: string, updateUserDto: UpdateUserDto): Promise<SafeUser> {
         const userId = Number(id);
         const user = await this.usersRepository.findOne({ where: { id: userId } });
         if (!user) {
@@ -54,7 +60,8 @@ export class UsersService {
         // Update the user with the new data
         Object.assign(user, updateUserDto);
         await this.usersRepository.save(user);
-        return user;
+        const { password, ...result } = user;
+        return result;
     }
 
     //5-remove()
