@@ -21,12 +21,17 @@ export class CategoriesService {
 
   //2- finde all
   findAll(): Promise<Category[]> {
-    return this.categoriesRepository.find();
+    return this.categoriesRepository.find({
+      relations: ['products']
+    });
   }
 
   //3- finde one
   async findOne(id: number): Promise<Category> {
-    const category = await this.categoriesRepository.findOneBy({ id });
+    const category = await this.categoriesRepository.findOne({
+      where: { id },
+      relations: ['products']
+    });
     if (!category) {
       throw new NotFoundException(`Category with id ${id} not found`);
     }
