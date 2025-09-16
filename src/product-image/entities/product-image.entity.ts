@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Product } from 'src/products/entites/product.entity';
+import { Product } from 'src/products/entities/product.entity';
 
 
 @Entity('product_images')
