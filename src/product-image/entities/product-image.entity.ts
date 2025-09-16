@@ -19,6 +19,9 @@ export class ProductImage {
   @ManyToOne(() => Product, (product) => product.images, { onDelete: 'CASCADE' })
   product: Product;
 
+  @Column({ name: 'product_id' })
+  productId: string;
+
   @CreateDateColumn()
   created_at: Date;
 

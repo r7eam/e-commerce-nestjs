@@ -1,11 +1,13 @@
+import { Type } from 'class-transformer';
 import { IsNotEmpty, IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class CreateProductImageDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  image_url: string;
+  image_url?: string;
 
   @IsOptional()
+  @Type(() => Boolean)
   @IsBoolean()
   is_primary?: boolean;
 
@@ -14,5 +16,6 @@ export class CreateProductImageDto {
   alt_text?: string;
 
   @IsNotEmpty()
-  productId: number;
+  @IsString()
+  productId: string;
 }
