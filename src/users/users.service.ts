@@ -11,6 +11,9 @@ type SafeUser = Omit<User, 'password'>;
 
 @Injectable()
 export class UsersService {
+    updatePassword(userId: number, hashedNewPassword: string) {
+        throw new Error('Method not implemented.');
+    }
     constructor(
         @InjectRepository(User)
         private readonly usersRepository: Repository<User>,
@@ -34,7 +37,17 @@ export class UsersService {
         await this.usersRepository.save(user);
         const { password, ...result } = user;
         return result;
+
     }
+    // Add these methods to your existing UsersService
+
+   async findById(id: number): Promise<User | null> {
+    return await this.usersRepository.findOne({ where: { id } });
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return await this.usersRepository.findOne({ where: { email } });
+  }
 
     //2-findAll()
     async findAll(): Promise<SafeUser[]> {
@@ -73,4 +86,5 @@ export class UsersService {
         }
         await this.usersRepository.remove(user);
     }
+    
 }
