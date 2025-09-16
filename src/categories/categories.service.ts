@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
@@ -12,12 +12,30 @@ export class CategoriesService {
     @InjectRepository(Category)
     private categoriesRepository: Repository<Category>,
   ) {}
+  
 
   //1- create
-  create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    const category = this.categoriesRepository.create(createCategoryDto);
+  async create(
+    createCategoryDto: CreateCategoryDto,
+    image?: Express.Multer.File,
+  ): Promise<Category> {
+    const { name, description } = createCategoryDto;
+    const existingCategory = await this.categoriesRepository.findOne({
+      where: { name: name },
+    });
+    if (existingCategory) {
+      throw new ConflictException('Category already exists!');
+    }
+
+    const category = this.categoriesRepository.create({
+      name: name,
+      description: description || '',
+      image: `/uploads/categories/${image ? image.filename : ''}`,
+    });
     return this.categoriesRepository.save(category);
   }
+
+  
 
   //2- finde all
   findAll(): Promise<Category[]> {

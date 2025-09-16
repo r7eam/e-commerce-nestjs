@@ -6,8 +6,10 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
+import { ProductImage } from 'src/product-image/entities/product-image.entity';
 
 @Entity() 
 export class Product {
@@ -29,6 +31,9 @@ export class Product {
 
   @Column({ nullable: true })
   category_id: number;
+
+  @OneToMany(() => ProductImage, (image) => image.product)
+  images: ProductImage[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
